@@ -7,7 +7,13 @@ from .models import User
 
 
 def index(request):
-    return render(request, "index.html")
+    context = {}
+    try:
+        if request.session["email"]:
+            context["email"] = request.session["email"]
+    except KeyError:
+        pass
+    return render(request, "index.html", context=context)
 
 
 def login(request):
@@ -49,3 +55,12 @@ def register(request):
         except:
             message = "Something went wrong...."
     return render(request, "register.html", context={"message": message})
+
+
+def logout(request):
+    try:
+        del request.session["email"]
+        del request.session["password"]
+    except:
+        pass
+    return redirect("index")
