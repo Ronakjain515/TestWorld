@@ -72,7 +72,8 @@
                     <div class="offset-xl-3 col-xl-6 offset-lg-2 col-lg-8 col-md-12 col-sm-12">
                         <div class="col-lg-10 col-md-6 col-sm-12">
                             <div class="contact-form">
-                                <form  id="contact" action="" method="get">
+                                <form  id="loginForm" action="{% url 'login' %}" method="post">
+                                    {% csrf_token %}
                                     <div class="row">
                                         <div style="margin: auto;" class="col-lg-10 col-md-12 col-sm-12">
                                             <label style="color: white; font-size: 20px">LOGIN</label>
@@ -87,7 +88,10 @@
                                                 <input name="password" type="password" class="form-control" id="password" placeholder="Password" required>
                                             </fieldset>
                                         </div>
-                                        <a href="#features" style="margin: auto;" class="main-button-slider">Login</a>
+                                        <a href="javascript:LoginSubmit()" style="margin: auto;" class="main-button-slider">Login</a>
+                                        <div style="margin: auto;" class="col-lg-10 col-md-12 col-sm-12">
+                                            <label id="commentBox" style="color: white; font-size: 15px">{{ message }}</label>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -140,3 +144,36 @@
 
   </body>
 </html>
+
+<script>
+    $( document ).ready(function() {
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    });
+
+    function LoginSubmit()
+    {
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+
+
+        if(email === "")
+        {
+            CommentBox("Please Enter Email");
+            return;
+        }
+        if (!(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)))
+        {
+            CommentBox("Please Enter valid Email");
+            return;
+        }
+        if(password === "")
+        {
+            CommentBox("Please Enter Password");
+            return;
+        }
+        document.getElementById("loginForm").submit();
+    }
+
+</script>
