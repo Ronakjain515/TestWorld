@@ -72,7 +72,8 @@
                     <div class="offset-xl-3 col-xl-6 offset-lg-2 col-lg-8 col-md-12 col-sm-12">
                         <div class="col-lg-10 col-md-6 col-sm-12">
                             <div class="contact-form">
-                                <form  id="contact" action="" method="get">
+                                <form  id="registerForm" action="{% url 'register' %}" method="post">
+                                    {% csrf_token %}
                                     <div class="row">
                                         <div style="margin: auto;" class="col-lg-10 col-md-12 col-sm-12">
                                             <label style="color: white; font-size: 20px">REGISTER</label>
@@ -92,7 +93,10 @@
                                                 <input name="password" type="password" class="form-control" id="password" placeholder="Password" required>
                                             </fieldset>
                                         </div>
-                                        <a href="#features" style="margin: auto;" class="main-button-slider">Register</a>
+                                        <a href="javascript:RegisterSubmit()" style="margin: auto;" class="main-button-slider">Register</a>
+                                        <div style="margin: auto;" class="col-lg-10 col-md-12 col-sm-12">
+                                            <label id="commentBox" style="color: white; font-size: 15px">{{ message }}</label>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -145,3 +149,57 @@
 
   </body>
 </html>
+
+<script>
+    $( document ).ready(function() {
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+        setTimeout(function() {
+            commentBox.innerHTML = "";
+        }, 4000)
+    });
+
+    function RegisterSubmit()
+    {
+        var name = document.getElementById("name").value;
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+
+        if(name === "")
+        {
+            CommentBox("Please Enter Name");
+            return;
+        }
+        if(!(/^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/.test(name)))
+        {
+            CommentBox("Please Enter Valid Name");
+            return;
+        }
+        if(email === "")
+        {
+            CommentBox("Please Enter Email");
+            return;
+        }
+        if (!(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)))
+        {
+            CommentBox("Please Enter valid Email");
+            return;
+        }
+        if(password === "")
+        {
+            CommentBox("Please Enter Password");
+            return;
+        }
+        document.getElementById("registerForm").submit();
+    }
+
+    function CommentBox(data)
+    {
+        var commentBox = document.getElementById("commentBox");
+        commentBox.innerHTML = data;
+        setTimeout(function() {
+            commentBox.innerHTML = "";
+        }, 4000)
+    }
+</script>

@@ -150,8 +150,10 @@
         if ( window.history.replaceState ) {
             window.history.replaceState( null, null, window.location.href );
         }
+        setTimeout(function() {
+            commentBox.innerHTML = "";
+        }, 4000)
     });
-
     function LoginSubmit()
     {
         var email = document.getElementById("email").value;
@@ -176,4 +178,12 @@
         document.getElementById("loginForm").submit();
     }
 
+    function CommentBox(data)
+    {
+        var commentBox = document.getElementById("commentBox");
+        commentBox.innerHTML = data;
+        setTimeout(function() {
+            commentBox.innerHTML = "";
+        }, 4000)
+    }
 </script>

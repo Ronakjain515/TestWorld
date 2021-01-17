@@ -22,7 +22,7 @@ def login(request):
                 if isUserExist == 1:
                     request.session["email"] = email
                     request.session["password"] = password
-                    return redirect("register")
+                    return redirect("index")
                 else:
                     message = "Invalid Credentials..."
             else:
@@ -33,4 +33,19 @@ def login(request):
 
 
 def register(request):
-    return render(request, "register.html")
+    message = ""
+    if request.method == "POST":
+        try:
+            name = request.POST['name']
+            email = request.POST['email']
+            password = request.POST['password']
+            isUserExist = User.objects.all().filter(email=email).count()
+            if isUserExist == 0:
+                user = User(name=name, email=email, password=password)
+                user.save()
+                return redirect("login")
+            else:
+                message = "Email already Exist"
+        except:
+            message = "Something went wrong...."
+    return render(request, "register.html", context={"message": message})
