@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q
-from .models import User
+from .models import User, Test
 # Create your views here.
 
 
@@ -13,6 +13,9 @@ def index(request):
             context["email"] = request.session["email"]
     except KeyError:
         pass
+
+    context["tests"] = Test.objects.all()
+
     return render(request, "index.html", context=context)
 
 
@@ -64,3 +67,7 @@ def logout(request):
     except:
         pass
     return redirect("index")
+
+
+def test(request):
+    return render(request, "test.html")

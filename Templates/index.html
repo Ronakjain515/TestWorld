@@ -201,69 +201,26 @@
 
             <!-- ***** test cards Start ***** -->
             <div class="row">
-
+                {% for test in tests %}
                 <div class="col-lg-4 col-md-6 col-sm-12" data-scroll-reveal="enter bottom move 50px over 0.6s after 0.2s">
                     <div class="pricing-item">
                         <div class="pricing-body" style="padding: 0px 30px;">
                             <div class="price-wrapper">
-                                <span class="currency">Python</span>
+                                <span class="currency">{{ test.name }}</span>
                             </div>
                             <ul class="list">
-                                <li class="active">My name is Ronak jain My Name is Ronak jain My name is ronak jain</li>
-                                <li class="active">10 Questions</li>
-                                <li class="active">15 min Time</li>
+                                <li class="active">{{ test.description }}</li>
+                                <li class="active">{{ test.noOfQuestion }} Questions</li>
+                                <li class="active">{{ test.timer }} min Time</li>
                             </ul>
                         </div>
                         <div class="pricing-footer">
-                            <a href="#" class="main-button">Start Test</a>
+                            <a href="{% url 'test' %}" class="main-button">Start Test</a>
                         </div>
                     </div>
                 </div>
-
-
-                <!-- ***** Pricing Item Start ***** -->
-                <div class="col-lg-4 col-md-6 col-sm-12" data-scroll-reveal="enter bottom move 50px over 0.6s after 0.4s">
-                    <div class="pricing-item active">
-                        <div class="pricing-body" style="padding: 0px 30px;">
-                            <div class="price-wrapper">
-                                <span class="currency">Java</span>
-                            </div>
-                            <ul class="list">
-                                <ul class="list">
-                                <li class="active">My name is Ronak jain My Name is Ronak jain My name is ronak jain</li>
-                                <li class="active">10 Questions</li>
-                                <li class="active">15 min Time</li>
-                            </ul>
-                            </ul>
-                        </div>
-                        <div class="pricing-footer">
-                            <a href="#" class="main-button">Start Test</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- ***** Pricing Item End ***** -->
-
-                <!-- ***** Pricing Item Start ***** -->
-                <div class="col-lg-4 col-md-6 col-sm-12" data-scroll-reveal="enter bottom move 50px over 0.6s after 0.6s">
-                    <div class="pricing-item">
-                        <div class="pricing-body" style="padding: 0px 30px;">
-                            <div class="price-wrapper">
-                                <span class="currency">C++</span>
-                            </div>
-                            <ul class="list">
-                                <ul class="list">
-                                <li class="active">My name is Ronak jain My Name is Ronak jain My name is ronak jain</li>
-                                <li class="active">10 Questions</li>
-                                <li class="active">15 min Time</li>
-                            </ul>
-                            </ul>
-                        </div>
-                        <div class="pricing-footer">
-                            <a href="#" class="main-button">Start Test</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- ***** Pricing Item End ***** -->
+                {% endfor %}
+                <!-- ***** test cards Ends ***** -->
             </div>
         </div>
     </section>
