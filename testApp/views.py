@@ -2,7 +2,8 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q
-from .models import User, Test
+from .models import User, Test, Test_User_Occurrence, Question, MCQQuestion
+
 # Create your views here.
 
 
@@ -70,4 +71,36 @@ def logout(request):
 
 
 def test(request):
+    if request.method == "POST" and request.session["email"]:
+        context = {}
+
+        if request.POST.get("status") == "start":
+            userData = User.objects.get(Q(email=request.session["email"]) & Q(password=request.session["password"]))
+            testData = Test.objects.get(id=request.POST.get("testId"))
+            
+            occurrence = Test_User_Occurrence(testId=testData, userId=userData)
+            occurrence.save()
+            
+            questionData = Question.objects.all().filter(testId=testData).first()
+
+            context["occurrenceId"] = occurrence.id
+            context["status"] = "onGoing"
+            context["question"] = questionData
+            context["timer"] = testData.timer
+
+            questionOverview = list(Question.objects.values("id").filter(testId=testData))
+            for i in range(len(questionOverview)):
+                questionOverview[i]["save"] = False
+                questionOverview[i]["index"] = i + 1
+            context["questionOverview"] = questionOverview
+
+            if questionData.type == "MCQ":
+                mcqQuestion = MCQQuestion.objects.all().filter(questionId=questionData).first()
+                context["mcqQuestion"] = mcqQuestion
+
+
+        elif request.POST.get("status") == "onGoing":
+            pass
+
+        return render(request, "test.html", context=context)
     return render(request, "test.html")

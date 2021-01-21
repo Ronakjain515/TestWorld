@@ -215,7 +215,7 @@
                             </ul>
                         </div>
                         <div class="pricing-footer">
-                            <a href="{% url 'test' %}" class="main-button">Start Test</a>
+                            <a href="javascript: startTest('{{ test.id }}')" class="main-button">Start Test</a>
                         </div>
                     </div>
                 </div>
@@ -366,3 +366,38 @@
 
   </body>
 </html>
+
+<script>
+
+    function startTest(testId)
+    {
+        {% if email %}
+            var form = document.createElement("form");
+            var element1 = document.createElement("input"); 
+            var element2 = document.createElement("input");
+            var element3 = document.createElement("input");  
+
+            form.method = "POST";
+            form.action = "{% url 'test' %}";   
+
+            element1.value=testId;
+            element1.name="testId";
+            form.appendChild(element1);
+            
+            element2.value='{{ csrf_token }}';
+            element2.name="csrfmiddlewaretoken";
+            form.appendChild(element2);
+            
+
+            element3.value="start";
+            element3.name="status";
+            form.appendChild(element3);
+
+            document.body.appendChild(form);
+
+            form.submit();
+        {% else %}
+            alert("Please login to continue with test...");
+        {% endif %}
+    }
+</script>

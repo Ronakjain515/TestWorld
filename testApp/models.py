@@ -49,3 +49,9 @@ class QuestionImage(models.Model):
     questionId = models.ForeignKey(Question, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="questionImage/")
 
+
+class Test_User_Occurrence(models.Model):
+    testId = models.ForeignKey(Test, on_delete=models.CASCADE)
+    userId = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+    
