@@ -72,30 +72,46 @@
                 <div class="col-sm-8" style="padding: 1%">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Q. {{ question.question }}</h5>
+                            <h5 class="card-title" id="questionTitle"></h5>
                             <div class="row">
                                 {% if question.type == "MCQ" %}
                                     <div class="col">
                                         <div class="form-check" style="margin-top: 1%;">
-                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                            {% if answer == "1" %}
+                                                <input class="form-check-input" checked type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="1">
+                                            {% else %}
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="1">
+                                            {% endif %}
                                             <label class="form-check-label" for="flexRadioDefault1">
                                                 {{ mcqQuestion.option1 }}
                                             </label>
                                         </div>
                                         <div class="form-check" style="margin-top: 1%;">
-                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+                                            {% if answer == "2" %}
+                                                <input class="form-check-input" checked type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="2">
+                                            {% else %}
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="2">
+                                            {% endif %}
                                             <label class="form-check-label" for="flexRadioDefault2">
                                                 {{ mcqQuestion.option2 }}
                                             </label>
                                         </div>
                                         <div class="form-check" style="margin-top: 1%;">
-                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
+                                            {% if answer == "3" %}
+                                                <input class="form-check-input" checked type="radio" name="flexRadioDefault" id="flexRadioDefault3" value="3">
+                                            {% else %}
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3" value="3">
+                                            {% endif %}
                                             <label class="form-check-label" for="flexRadioDefault3">
                                                 {{ mcqQuestion.option3 }}
                                             </label>
                                         </div>
                                         <div class="form-check" style="margin-top: 1%;">
-                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault4" checked>
+                                            {% if answer == "4" %}
+                                                <input class="form-check-input" checked type="radio" name="flexRadioDefault" id="flexRadioDefault4" value="4">
+                                            {% else %}
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault4" value="4">
+                                            {% endif %}
                                             <label class="form-check-label" for="flexRadioDefault4">
                                                 {{ mcqQuestion.option4 }}
                                             </label>
@@ -108,9 +124,17 @@
 <!--                                </div>-->
                             </div>
                             <div class="row" style="margin-top: 10%">
-                                <a style="margin-left: 2%" href="#" class="main-button"><b>Previous</b></a>
-                                <a style="margin: auto" href="#features" class="main-button-slider"><b>Save</b></a>
-                                <a style="margin-right: 2%" href="#" class="main-button"><b>Skip</b></a>
+                                {% if questionIndex == 0 %}
+                                    <a style="margin-left: 2%" class="main-button"><b>Previous</b></a>
+                                {% else %}
+                                    <a style="margin-left: 2%" href="javascript: saveAnswer(false, {{ questionIndex }} - 1)" class="main-button"><b>Previous</b></a>
+                                {% endif %}
+                                <a style="margin: auto" href="javascript: saveAnswer(true, {{ questionIndex }} + 1)" class="main-button-slider"><b>Save</b></a>
+                                {% if questionOverview|length == questionIndex|add:1 %}              
+                                    <a style="margin-right: 2%" class="main-button"><b>Skip</b></a>
+                                {% else %}
+                                    <a style="margin-right: 2%" href="javascript: saveAnswer(false, {{ questionIndex }} + 1)" class="main-button"><b>Skip</b></a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -123,9 +147,9 @@
                                 {% for overview in questionOverview %}
                                     <div class="col-3" style="margin-top: 5px; margin-bottom: 5px;">
                                         {% if overview.save %}
-                                            <button class="quesOverviewBtn quesOverviewBtn_Save">{{ overview.index }}</button>
+                                            <button onclick="saveAnswer(false, {{ overview.index }} - 1)" class="quesOverviewBtn quesOverviewBtn_Save">{{ overview.index }}</button>
                                         {% else %}
-                                            <button class="quesOverviewBtn quesOverviewBtn_notSave">{{ overview.index }}</button>
+                                            <button onclick="saveAnswer(false, {{ overview.index }} - 1)" class="quesOverviewBtn quesOverviewBtn_notSave">{{ overview.index }}</button>
                                         {% endif %}
                                     </div>
                                 {% endfor %}
@@ -189,27 +213,91 @@
 
 <script>
     $(document).ready(function(){
-    var duration = {{ timer }} * 60;
-    var timer = duration, minutes, seconds;
-    var minutesDiv = document.getElementById("minutes");
-    var secondsDiv = document.getElementById("seconds");
 
-    setInterval(function () {
-        minutes = parseInt(timer / 60, 10);
-        seconds = parseInt(timer % 60, 10);
+        // setting question with question number
+        document.getElementById("questionTitle").innerHTML = "Q " + ({{ questionIndex }} + 1) + ". {{ question.question }}";
 
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
+        var minutes = {{ timer_min }}
+        var seconds = {{ timer_sec }}
 
-        minutesDiv.innerHTML = minutes;
-        secondsDiv.innerHTML = seconds;
-        console.log(seconds);
+        var minutesDiv = document.getElementById("minutes");
+        var secondsDiv = document.getElementById("seconds");
 
-        if (--timer < 0) {
-            timer = duration;
+        setInterval(function () {
+
+            minutesDiv.innerHTML = minutes < 10 ? "0" + minutes : minutes;
+            secondsDiv.innerHTML = seconds < 10 ? "0" + seconds : seconds;
+            
+            seconds = seconds - 1;
+
+            if (seconds < 0) {
+                minutes = minutes - 1;
+                seconds = 60;
+            }
+        }, 1000);
+    });
+    function saveAnswer(isSave, questionIndex)
+    {
+        var minutes = document.getElementById("minutes").innerHTML;
+        var seconds = document.getElementById("seconds").innerHTML;
+
+        var form = document.createElement("form");
+        var element1 = document.createElement("input"); 
+        var element2 = document.createElement("input");
+        var element3 = document.createElement("input");  
+        var element4 = document.createElement("input");  
+        var element5 = document.createElement("input"); 
+        var element6 = document.createElement("input");  
+        var element7 = document.createElement("input");  
+
+        form.method = "POST";
+        form.action = "{% url 'test' %}";   
+
+        element1.value='{{ occurrenceId }}';
+        element1.name="occurrenceId";
+        form.appendChild(element1);
+        
+        element2.value='{{ csrf_token }}';
+        element2.name="csrfmiddlewaretoken";
+        form.appendChild(element2);
+        
+
+        element3.value="onGoing";
+        element3.name="status";
+        form.appendChild(element3);
+
+        element4.value=minutes;
+        element4.name="timer_min";
+        form.appendChild(element4);
+
+        element5.value=seconds;
+        element5.name="timer_sec";
+        form.appendChild(element5);
+
+        element7.value=questionIndex;
+        element7.name="questionIndex";
+        form.appendChild(element7);       
+
+        if(isSave){
+            element6.name="answer";
+            {% if question.type == "MCQ" %}
+                if(document.getElementById("flexRadioDefault1").checked)    element6.value = document.getElementById("flexRadioDefault1").value
+                else if(document.getElementById("flexRadioDefault2").checked)    element6.value = document.getElementById("flexRadioDefault2").value
+                else if(document.getElementById("flexRadioDefault3").checked)    element6.value = document.getElementById("flexRadioDefault3").value
+                else if(document.getElementById("flexRadioDefault4").checked)    element6.value = document.getElementById("flexRadioDefault4").value
+                else {
+                    alert("Please select option..");
+                    return;
+                }
+            {% endif %}
+
+            form.appendChild(element6);
         }
-    }, 1000);
-});
+
+        document.body.appendChild(form);
+
+        form.submit();
+    }
 </script>
 <style>
     .quesOverviewBtn{

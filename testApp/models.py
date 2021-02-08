@@ -17,7 +17,8 @@ class Test(models.Model):
     name = models.CharField(max_length=20)
     description = models.CharField(max_length=100)
     noOfQuestion = models.IntegerField()
-    timer = models.IntegerField()
+    timer_minutes = models.IntegerField()
+    timer_seconds = models.IntegerField()
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -55,3 +56,9 @@ class Test_User_Occurrence(models.Model):
     userId = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     
+
+class Test_User_Questions(models.Model):
+    questionId = models.ForeignKey(Question, on_delete=models.CASCADE)
+    occurrenceId = models.ForeignKey(Test_User_Occurrence, on_delete=models.CASCADE)
+    answer = models.CharField(max_length=500)
+    date = models.DateTimeField(auto_now_add=True)

@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q
-from .models import User, Test, Test_User_Occurrence, Question, MCQQuestion
+from .models import User, Test, Test_User_Occurrence, Question, MCQQuestion, Test_User_Questions
 
 # Create your views here.
 
@@ -86,21 +86,60 @@ def test(request):
             context["occurrenceId"] = occurrence.id
             context["status"] = "onGoing"
             context["question"] = questionData
-            context["timer"] = testData.timer
+            context["questionIndex"] = 0
+            context["timer_min"] = testData.timer_minutes
+            context["timer_sec"] = testData.timer_seconds
 
-            questionOverview = list(Question.objects.values("id").filter(testId=testData))
+            questionOverview = list(Question.objects.values("id").filter(testId=testData).order_by("id"))
             for i in range(len(questionOverview)):
                 questionOverview[i]["save"] = False
                 questionOverview[i]["index"] = i + 1
             context["questionOverview"] = questionOverview
 
-            if questionData.type == "MCQ":
-                mcqQuestion = MCQQuestion.objects.all().filter(questionId=questionData).first()
-                context["mcqQuestion"] = mcqQuestion
-
-
         elif request.POST.get("status") == "onGoing":
-            pass
+            
+            questionIndex = int(request.POST.get("questionIndex"))
+            context["occurrenceId"] = request.POST.get("occurrenceId")
+            context["status"] = request.POST.get("onGoing")
+            context["timer_min"] = request.POST.get("timer_min")
+            context["timer_sec"] = request.POST.get("timer_sec")
+            context["questionIndex"] = questionIndex
 
+            occurrence = Test_User_Occurrence.objects.get(id=request.POST.get("occurrenceId"))
+            questionData = Question.objects.all().filter(testId=occurrence.testId)[questionIndex]
+            
+            context["question"] = questionData
+
+            answer = request.POST.get("answer")
+            if answer != None:
+                question = Question.objects.all().filter(testId=occurrence.testId)[questionIndex - 1]
+                test_user_question = Test_User_Questions()
+                try:
+                    test_user_question = Test_User_Questions.objects.get(questionId=question, occurrenceId=occurrence)
+                    test_user_question.answer = answer
+                except test_user_question.DoesNotExist:
+                    test_user_question = Test_User_Questions(questionId=question, occurrenceId=occurrence, answer=answer)
+                test_user_question.save()
+
+
+            test_user_question_overview = Test_User_Questions.objects.values_list("questionId", flat=True).filter(occurrenceId=occurrence)
+            questionOverview_data = Question.objects.values_list("id", flat=True).filter(testId=occurrence.testId).order_by("id")
+            questionOverview = []
+            i = 1
+            for question in questionOverview_data:
+                if question in test_user_question_overview:
+                    questionOverview.append({"id": question, "save": True, "index": i})
+                    if questionData.id == question:
+                        answerdata = Test_User_Questions.objects.values_list("answer", flat=True).filter(questionId=questionData.id, occurrenceId=occurrence)
+                        context["answer"] = answerdata[0]
+                else:
+                    questionOverview.append({"id": question, "save": False, "index": i})
+                i = i + 1
+            context["questionOverview"] = questionOverview
+
+        if questionData.type == "MCQ":
+            mcqQuestion = MCQQuestion.objects.all().filter(questionId=questionData).first()
+            context["mcqQuestion"] = mcqQuestion
+        
         return render(request, "test.html", context=context)
     return render(request, "test.html")
