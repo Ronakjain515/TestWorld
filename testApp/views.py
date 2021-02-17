@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from .models import User, Test, Test_User_Occurrence, Question, MCQQuestion, Test_User_Questions
-
+from .forms import TalkToUsForm
 # Create your views here.
 
 
@@ -14,8 +14,24 @@ def index(request):
             context["email"] = request.session["email"]
     except KeyError:
         pass
+    
+    # Talk to us form submission
+    if request.method =="POST":
+        try:
+            if request.POST["formSubmitted"] == "TalkToUsForm":
+                form = TalkToUsForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                    context["TalkToUs"] = "done"
+                else:
+                    context["TalkToUs"] = "notValid"
+        except:
+            context["TalkToUs"] = "error"
 
     context["tests"] = Test.objects.all()
+
+    context["testCount"] = Test.objects.all().count()
+    context["userCount"] = User.objects.all().count()
 
     return render(request, "index.html", context=context)
 

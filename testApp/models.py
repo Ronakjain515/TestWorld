@@ -62,3 +62,9 @@ class Test_User_Questions(models.Model):
     occurrenceId = models.ForeignKey(Test_User_Occurrence, on_delete=models.CASCADE)
     answer = models.CharField(max_length=500)
     date = models.DateTimeField(auto_now_add=True)
+
+
+class TalkToUs(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.CharField(max_length=1000)
